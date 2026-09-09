@@ -1,0 +1,30 @@
+# Keil generated build outputs
+pet/MDK-ARM/pet/
+
+# User-specific Keil settings
+**/*.uvguix.*
+**/*.uvoptx
+
+# Keil debug and build directories
+**/Objects/
+**/Listings/
+**/DebugConfig/
+**/JLinkLog.txt
+**/JLinkSettings.ini
+
+# CubeMX and editor temporary files
+**/*.bak
+**/*~
+**/~$*
+.vscode/*
+
+# Common generated files
+*.dep
+*.crf
+*.d
+*.o
+*.axf
+*.hex
+*.map
+*.lst
+*.htm
