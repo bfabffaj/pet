@@ -478,6 +478,11 @@
               <FileType>1</FileType>
               <FilePath>..\Core\Src\dht11.c</FilePath>
             </File>
+            <File>
+              <FileName>oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\oled.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

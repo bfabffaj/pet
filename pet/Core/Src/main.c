@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "dht11.h"
+#include "oled.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -69,7 +70,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  uint8_t oled_ready;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -95,6 +96,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim2);
+  oled_ready = OLED_Init();
   HAL_Delay(2000); // Wait for DHT11 to stabilize
   /* USER CODE END 2 */
 
@@ -102,12 +104,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
     uint8_t temperature = 0;
     uint8_t humidity = 0;
+    uint8_t valid;
     char msg[32];
     int len;
 
-    if(DHT11_READ(&temperature, &humidity) == 1)
+    valid = DHT11_READ(&temperature, &humidity);
+    if(valid == 1)
     {
         len = snprintf(msg, sizeof(msg), "d:%u,%u\r\n",(unsigned int) temperature,(unsigned int) humidity);
         HAL_UART_Transmit(&huart2,(uint8_t*)msg, (uint16_t)len, 100);
@@ -119,10 +126,15 @@ int main(void)
         HAL_UART_Transmit(&huart2, error_msg, sizeof(error_msg) - 1, 100);
     }
    
+    if (!oled_ready) oled_ready = OLED_Init();
+    if (oled_ready)
+        oled_ready = OLED_ShowReadings(temperature, humidity, valid);
+    if (!oled_ready)
+    {
+        uint8_t oled_error[] = "OLED I2C Error\r\n";
+        HAL_UART_Transmit(&huart2, oled_error, sizeof(oled_error) - 1, 100);
+    }
     HAL_Delay(2000);
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
