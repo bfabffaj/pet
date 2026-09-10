@@ -24,6 +24,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "dht11.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,15 +95,31 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim2);
+  HAL_Delay(2000); // Wait for DHT11 to stabilize
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    uint8_t msg[] = "d:26.0,55.0\r\n";
-    HAL_UART_Transmit(&huart2, msg, sizeof(msg) - 1, 100);
-    HAL_Delay(1000);
+    uint8_t temperature = 0;
+    uint8_t humidity = 0;
+    char msg[32];
+    int len;
+
+    if(DHT11_READ(&temperature, &humidity) == 1)
+    {
+        len = snprintf(msg, sizeof(msg), "d:%u,%u\r\n",(unsigned int) temperature,(unsigned int) humidity);
+        HAL_UART_Transmit(&huart2,(uint8_t*)msg, (uint16_t)len, 100);
+    }
+    else
+    {
+        uint8_t error_msg[] = "DHT11 Read Error\r\n";
+        
+        HAL_UART_Transmit(&huart2, error_msg, sizeof(error_msg) - 1, 100);
+    }
+   
+    HAL_Delay(2000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
